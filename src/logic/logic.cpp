@@ -25,54 +25,33 @@ string element::setName(string name)
     return unpreferred;
 }
 
+string element::setValue(string newValue)
+{
+    this->value = newValue;
+}
+
 element::element(string type, string name)
 {
     this->setType(type);
     this->setName(name);
 }
 
-
-/* Broken
-string element::sim()
+element setSource(element *source)
 {
-    string a = this->a;
-    string b = this->b;
+    this->source = source;
+}
 
-    //Not
-    if (this->type == "not") {
+element setDestination(element *source)
+{
+    this->destination = destination;
+}
 
-        if (a == preferred) {
-            return unpreferred;
-        } else {
-            return preferred;
-        }
-    }
+element connection::getSource()
+{
+    return this->source;
+}
 
-    //Or
-    if (this->type == "or") {
-        if ((a == preferred) && (b == preferred)) {
-            return preferred;
-        }
-        if ((a == preferred) || (b == preferred)) {
-            return preferred;
-        }
-        if ((a == unpreferred) && (b == unpreferred)){
-            return unpreferred;
-        }
-    }
-
-    //And
-    if(this->type == "and"){
-        if ((a == preferred) && (b == preferred)) {
-            return preferred;
-        }
-        if ((a == unpreferred) || (b == unpreferred)) {
-            return unpreferred;
-        }
-        if ((a == unpreferred) && (b == unpreferred)) {
-            return unpreferred;
-        }
-    }
-
-    return "undefined";
-}*/
+element connection::getDestination()
+{
+    return this->destination;
+}
