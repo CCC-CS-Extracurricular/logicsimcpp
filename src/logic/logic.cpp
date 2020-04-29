@@ -9,6 +9,8 @@ string Not(string a)
     } else {
         return preferred;
     }
+
+    return "undefined";
 }
 
 // Basic OR function
@@ -23,6 +25,7 @@ string Or(string a, string b)
     if ((a == unpreferred) && (b == unpreferred)){
         return unpreferred;
     }
+    return "undefined";
 }
 
 // Basic AND function
@@ -36,4 +39,5 @@ string And(string a, string b) {
     if ((a == unpreferred) && (b == unpreferred)) {
         return unpreferred;
     }
+    return "undefined";
 }
