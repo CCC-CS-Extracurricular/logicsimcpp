@@ -1,0 +1,11 @@
+#
+# Making repos clean again!
+#
+
+#Compiling files
+obj/*
+obj/
+
+#Executable
+logicsim
+logicsim*

@@ -1,8 +1,9 @@
-
 #include <vector>
+#include <string>
 
-string preferred = 1;         //preferred string (defaults to 1)
-string unpreferred = 0;       //unpreferred string (defaults to 0)
+using namespace std;
+
+class connection;
 
 class element {
     private:
@@ -11,7 +12,7 @@ class element {
         string value;   //for "switch" and "lamp" elements
 
     public:
-        element(type, name);
+        element(string type, string name);
         string setType(string type);
         string setName(string name);
         void addConnection(element *dest);
@@ -26,6 +27,6 @@ class connection {
         void setSource(element *source);
         void setDestination(element *destination);
 
-        element getSource();
-        element getDestination();
+        element* getSource();
+        element* getDestination();
 };
