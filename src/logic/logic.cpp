@@ -61,8 +61,8 @@ string element::evaluate() {
         }
 
         /* evaluate a NOT:
-            invert input
-            (if input is preferred return unpreferred, and vice versa) */
+         * invert input
+         * if input is preferred return unpreferred, and vice versa) */
 
         if (input == preferred) {
             return unpreferred;
@@ -89,8 +89,6 @@ string element::evaluate() {
         }
         if ((input[0] == preferred) && (input[1] == preferred)) {
             return preferred;
-        } else {
-            return unpreferred;
         }
         return unpreferred;
     }
@@ -100,8 +98,8 @@ string element::evaluate() {
         vector<string> input;
         int x = 0;
 
-        /*find our two inputs (aka destinations)\
-            by comparing `this` to all of our destination connections*/
+        /* find our two inputs (aka destinations)\
+         * by comparing `this` to all of our destination connections*/
         for(unsigned int i; i < this->connections.size(); i++){
             if(this->connections[i].getDestination() == this) {
                 //FIXME: this needs error checking
@@ -138,8 +136,8 @@ string element::evaluate() {
      * lamps "light up" if their input is "preferred" */
     if(this->type == "lamp") {
         string input;
-        /*find our single input (aka destinations)\
-         *by comparing `this` to all of our destination connections*/
+        /* find our single input (aka destinations)\
+         * by comparing `this` to all of our destination connections*/
         for(unsigned int i; i < this->connections.size(); i++){
             if(this->connections[i].getDestination() == this){
                 input = this->connections[i].getDestination()->evaluate();
