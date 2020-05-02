@@ -32,6 +32,7 @@ class connection {
         element* getDestination();
 };
 
+//Flawed
 /* class nott : public element {
     private:
 

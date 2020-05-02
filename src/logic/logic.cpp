@@ -69,20 +69,28 @@ string element::evaluate()
     //evaluate a NOT
     if(this->type == "not"){
         string input;
-        //find destination/input connection
+        /*find our two inputs (aka destinations)\
+            by comparing `this` to all of our destination connections*/
         for(unsigned int i; i < this->connections.size(); i++){
             if(this->connections[i].getDestination() == this){
                 input = this->connections[i].getDestination()->evaluate();
             }
         }
+
+        /* evaluate a NOT:
+            invert input
+            (if input is preferred return unpreferred, and vice versa) */
+
         if (input == preferred) {
             return unpreferred;
         } else if (input == unpreferred) {
             return preferred;
-        } else {
-            return "invalid";
         }
-    } else if(this->type == "and") { // evaluate an AND
+        return "invalid";
+    }
+
+    //evaluate an AND
+    if(this->type == "and") {
         vector<string> input;
         int x = 0;
 
@@ -99,6 +107,36 @@ string element::evaluate()
         } else {
             return unpreferred;
         }
+        return unpreferred;
+    }
+
+    //evaluate an OR
+    if(this->type == "or") {
+        vector<string> input;
+        int x = 0;
+
+        /*find our two inputs (aka destinations)\
+            by comparing `this` to all of our destination connections*/
+        for(unsigned int i; i < this->connections.size(); i++){
+            if(this->connections[i].getDestination() == this) {
+                //FIXME: this needs error checking
+                input[x] = connections[i].getDestination()->evaluate();
+                x++;
+            }
+        }
+
+        /* evaluate an OR:
+        if either input is preferred, return unpreferred
+        otherwise, return unpreferred */
+
+        if ((input[0] == preferred) && (input[1] == preferred)) {
+            return preferred;
+        } else if((input[0] == preferred) || (input[1] == preferred)){
+            return preferred;
+        } else if((input[0] == unpreferred) && (input[1] == unpreferred)){
+            return unpreferred;
+        }
+        return unpreferred;
     }
 
     return unpreferred;
