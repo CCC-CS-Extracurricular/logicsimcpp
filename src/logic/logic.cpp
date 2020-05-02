@@ -52,8 +52,8 @@ string element::evaluate() {
     //NOT evaluate function
     if(this->type == "not"){
         string input;
-        /*find our single input (aka destinations)\
-            by comparing `this` to all of our destination connections*/
+        /* find our single input (aka destinations)\
+         * by comparing `this` to all of our destination connections*/
         for(unsigned int i; i < this->connections.size(); i++){
             if(this->connections[i].getDestination() == this){
                 input = this->connections[i].getDestination()->evaluate();
@@ -66,7 +66,9 @@ string element::evaluate() {
 
         if (input == preferred) {
             return unpreferred;
-        } else if (input == unpreferred) {
+        }
+
+        if (input == unpreferred) {
             return preferred;
         }
         return "invalid";
@@ -109,31 +111,35 @@ string element::evaluate() {
         }
 
         /* evaluate an OR:
-        if either input is preferred, return unpreferred
-        otherwise, return unpreferred */
+         * if either input is preferred, return unpreferred
+         * otherwise, return unpreferred */
 
         if ((input[0] == preferred) && (input[1] == preferred)) {
             return preferred;
-        } else if((input[0] == preferred) || (input[1] == preferred)){
+        }
+
+        if((input[0] == preferred) || (input[1] == preferred)){
             return preferred;
-        } else if((input[0] == unpreferred) && (input[1] == unpreferred)){
+        }
+
+        if((input[0] == unpreferred) && (input[1] == unpreferred)){
             return unpreferred;
         }
         return unpreferred;
     }
 
     /* SWITCH evaluate function
-       switches return their stored values when they are evaluated */
+     * switches return their stored values when they are evaluated */
     if(this->type == "switch") {
         return value;
     }
 
     /* LAMP evaluate function
-       lamps "light up" if their input is "preferred" */
+     * lamps "light up" if their input is "preferred" */
     if(this->type == "lamp") {
         string input;
         /*find our single input (aka destinations)\
-            by comparing `this` to all of our destination connections*/
+         *by comparing `this` to all of our destination connections*/
         for(unsigned int i; i < this->connections.size(); i++){
             if(this->connections[i].getDestination() == this){
                 input = this->connections[i].getDestination()->evaluate();
@@ -143,9 +149,8 @@ string element::evaluate() {
         /* Set our value to preferred or unpreferred depending by input */
         if(input == preferred) {
             this->value = preferred;
-        } else {
-            this->value = unpreferred;
         }
+        this->value = unpreferred;
     }
     return unpreferred;
 }
