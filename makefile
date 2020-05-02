@@ -2,7 +2,9 @@
 
 GPPARGS = -Wall
 
-all: logic syntax
+all: logic syntax core
+
+core:
 	g++ ${GPPARGS} obj/*.o src/core.cpp -o logicsim
 
 logic:
