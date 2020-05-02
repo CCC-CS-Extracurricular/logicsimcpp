@@ -1,0 +1,9 @@
+//NOR implementation
+or or0
+not not0
+switch S0
+switch S1
+lamp L0
+or0 S0 or0 S1
+not0 or0
+L0 not0
