@@ -5,8 +5,7 @@ string preferred = "1";         //preferred string (defaults to 1)
 string unpreferred = "0";       //unpreferred string (defaults to 0)
 
 //set element type
-string element::setType(string type)
-{
+string element::setType(string type) {
     //set type only if the given type is valid
     if ((type == "not") || (type == "and") || (type == "or") ||
                 (type == "switch") || (type == "lamp")) {
@@ -17,8 +16,7 @@ string element::setType(string type)
 }
 
 //set element name
-string element::setName(string name)
-{
+string element::setName(string name) {
     //set name only if the given name is valid
     if ((type != "not") || (type != "and") || (type != "or") ||
                 (type != "switch") || (type != "lamp")) {
@@ -28,14 +26,12 @@ string element::setName(string name)
     return unpreferred;
 }
 
-string element::setValue(string newValue)
-{
+string element::setValue(string newValue) {
     this->value = newValue;
     return this->value;
 }
 
-element::element(string type, string name)
-{
+element::element(string type, string name) {
     this->setType(type);
     this->setName(name);
 }
@@ -52,8 +48,7 @@ element* connection::getSource() { return this->source; }
 // returns the destination element of a connection
 element* connection::getDestination() { return this->destination; }
 
-string element::evaluate()
-{
+string element::evaluate() {
     //NOT evaluate function
     if(this->type == "not"){
         string input;
@@ -152,6 +147,5 @@ string element::evaluate()
             this->value = unpreferred;
         }
     }
-
     return unpreferred;
 }
