@@ -17,6 +17,7 @@ class element {
         string setName(string name);
         void addConnection(element *dest);
         string setValue(string newValue);
+        string evaluate();
 };
 
 class connection {
@@ -30,3 +31,17 @@ class connection {
         element* getSource();
         element* getDestination();
 };
+
+/* class nott : public element {
+    private:
+
+    public:
+        string evaluate();
+};
+
+class andd : public element {
+    private:
+
+    public:
+        string evaluate();
+};*/
