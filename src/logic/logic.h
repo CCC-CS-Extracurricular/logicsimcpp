@@ -17,6 +17,7 @@ class element {
         string setName(string name);
         void addConnection(element *dest);
         string setValue(string newValue);
+        string getValue();
         string evaluate();
 };
 
