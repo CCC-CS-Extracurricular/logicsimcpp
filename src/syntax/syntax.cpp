@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include "core.h"
+#include "syntax.h"
 using namespace std;
+
 global vector<element> Token;
 
 
@@ -28,7 +29,8 @@ int FatRead (string Filepath) {
 						};
 						//parse the line by spaces
 							//THING NOTTHING THING NOTTHING
-							Location[0]=strParse[0]
+							
+							Location[0]=0
 							
 							Location[1]=strParse.find(" ")
 						
@@ -36,7 +38,7 @@ int FatRead (string Filepath) {
 							
 							
 							if ( !(strParse.find(" ",Location[1]))==NULL){
-								Token[1]=
+								Token[1]=strParse.find(Location[1])	
 							};
 							
 							
