@@ -40,7 +40,7 @@ int FatRead (string Filepath) {
 							if ( !(strParse.find(" ",Location[1]))==NULL){
 								Token[1]=strParse.find(Location[1])	
 							};
-							
+							//wombo
 							
 							Token[0]=strParse.substr(Location[0], Location[1])
 							
