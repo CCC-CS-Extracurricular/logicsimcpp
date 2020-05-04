@@ -20,6 +20,7 @@ class element {
         string getType();
         string getName();
         vector<connection> getConnections();
+        string getValue();
         string evaluate();
 };
 

@@ -1,12 +1,16 @@
 #include <iostream>
+#include <string>
+#include <vector>
 #include "logic.h"
 
-string preferred = "1";         //preferred string (defaults to 1)
-string unpreferred = "0";       //unpreferred string (defaults to 0)
+using namespace std;
 
-//set element type
+string preferred = "1";         // preferred string (defaults to 1)
+string unpreferred = "0";       // unpreferred string (defaults to 0)
+
+// set element type
 string element::setType(string type) {
-    //set type only if the given type is valid
+    // set type only if the given type is valid
     if ((type == "not") || (type == "and") || (type == "or") ||
                 (type == "switch") || (type == "lamp")) {
         this->type = type;
@@ -15,9 +19,9 @@ string element::setType(string type) {
     return unpreferred;
 }
 
-//set element name
+// set element name
 string element::setName(string name) {
-    //set name only if the given name is valid
+    // set name only if the given name is valid
     if ((type != "not") || (type != "and") || (type != "or") ||
                 (type != "switch") || (type != "lamp")) {
         this->name = name;
@@ -30,10 +34,18 @@ string element::getType() { return this->type; }
 string element::getName() { return this->name; }
 vector<connection> element::getConnections() { return this->connections; }
 
+// set a new value for an element
 string element::setValue(string newValue) {
-    this->value = newValue;
-    return this->value;
+
+    // Check new value for validity before assigning it
+    if((newValue == preferred) || (newValue == unpreferred)) {
+        this->value = newValue;
+        return preferred;
+    }
+    return unpreferred;
 }
+
+string element::getValue() { return this->value; }
 
 element::element(string type, string name) {
     this->setType(type);
@@ -53,13 +65,13 @@ element* connection::getSource() { return this->source; }
 element* connection::getDestination() { return this->destination; }
 
 string element::evaluate() {
-    //NOT evaluate function
-    if(this->type == "not"){
+    // NOT evaluate function
+    if(this->type == "not") {
         string input;
-        /* find our single input (aka destinations)\
+        /* find our single input (aka destinations)
          * by comparing `this` to all of our destination connections*/
-        for(unsigned int i; i < this->connections.size(); i++){
-            if(this->connections[i].getDestination() == this){
+        for(unsigned int i; i < this->connections.size(); i++) {
+            if(this->connections[i].getDestination() == this) {
                 input = this->connections[i].getDestination()->evaluate();
             }
         }
@@ -78,15 +90,15 @@ string element::evaluate() {
         return "invalid";
     }
 
-    //AND evaluate function
+    // AND evaluate function
     if(this->type == "and") {
         vector<string> input;
         int x = 0;
 
-        //find two destination/input connections
-        for(unsigned int i; i < this->connections.size(); i++){
+        // find two destination/input connections
+        for(unsigned int i; i < this->connections.size(); i++) {
             if(this->connections[i].getDestination() == this) {
-                //FIXME: this needs error checking
+                // FIXME: this needs error checking
                 input[x] = connections[i].getDestination()->evaluate();
                 x++;
             }
@@ -97,16 +109,16 @@ string element::evaluate() {
         return unpreferred;
     }
 
-    //OR evaluate function
+    // OR evaluate function
     if(this->type == "or") {
         vector<string> input;
         int x = 0;
 
-        /* find our two inputs (aka destinations)\
+        /* find our two inputs (aka destinations)
          * by comparing `this` to all of our destination connections*/
-        for(unsigned int i; i < this->connections.size(); i++){
+        for(unsigned int i; i < this->connections.size(); i++) {
             if(this->connections[i].getDestination() == this) {
-                //FIXME: this needs error checking
+                // FIXME: this needs error checking
                 input[x] = connections[i].getDestination()->evaluate();
                 x++;
             }
@@ -120,11 +132,11 @@ string element::evaluate() {
             return preferred;
         }
 
-        if((input[0] == preferred) || (input[1] == preferred)){
+        if((input[0] == preferred) || (input[1] == preferred)) {
             return preferred;
         }
 
-        if((input[0] == unpreferred) && (input[1] == unpreferred)){
+        if((input[0] == unpreferred) && (input[1] == unpreferred)) {
             return unpreferred;
         }
         return unpreferred;
@@ -140,10 +152,10 @@ string element::evaluate() {
      * lamps "light up" if their input is "preferred" */
     if(this->type == "lamp") {
         string input;
-        /* find our single input (aka destinations)\
+        /* find our single input (aka destinations)
          * by comparing `this` to all of our destination connections*/
         for(unsigned int i; i < this->connections.size(); i++){
-            if(this->connections[i].getDestination() == this){
+            if(this->connections[i].getDestination() == this) {
                 input = this->connections[i].getDestination()->evaluate();
             }
         }
