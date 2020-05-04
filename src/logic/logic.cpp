@@ -88,14 +88,10 @@ string element::evaluate() {
          * invert input
          * if input is preferred return unpreferred, and vice versa) */
 
-        if (input == preferred) {
-            return unpreferred;
-        }
-
         if (input == unpreferred) {
             return preferred;
         }
-        return "invalid";
+        return unpreferred;
     }
 
     // AND evaluate function
