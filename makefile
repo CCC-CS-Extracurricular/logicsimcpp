@@ -4,8 +4,8 @@ GPPARGS = -Wall
 
 all: logic syntax core
 
-core:
-	g++ ${GPPARGS} obj/*.o src/core.cpp -o logicsim
+debug: GPPARGS += -g
+debug: all
 
 logic:
 	mkdir -p obj
@@ -13,6 +13,9 @@ logic:
 syntax:
 	mkdir -p obj
 	g++ ${GPPARGS} -o obj/syntax.o -c src/syntax/syntax.cpp
+
+core:
+	g++ ${GPPARGS} obj/*.o src/core.cpp -o logicsim
 
 clean:
 	rm -r obj/
