@@ -1,35 +1,37 @@
 #include "core.h"
-#include <string>
-#include <fstream>
 
 using namespace std;
 
 int main(int argc, char** argv) {
-    //Error out if no argument for a file to open
-    if(argc < 2) {
+    //Argument parsing
+    if(argc < 2) { //Error out if no argument for a file to open
         cerr << "ERR: No file name argument." << endl;
         return 1;
     }
 
-    string filePath(argv[1]); //Uses a char* for the constructor
-
-    //cout << "Argument count: " << (argc - 1) << endl << "Arguments: " << endl;
-    //Iterate through argv
-    /*for(size_t argNum = 1; argNum < (sizeof(argv) / sizeof(char*)); argNum++) {
-        cout << "    " << argv[argNum] << endl;
-    }*/
-
-    //Check if file is open: https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exist-using-standard-c-c11-c
-    ifstream circuitFile(filePath);
-    if(circuitFile.bad()) { //Check if the file isn't openable for whatever reason
-        cerr << "Unable to open file: " << filePath << endl;
+    ifstream circuitFile(argv[1]); //Take the first command line argument as a string with the filename
+    if(circuitFile.rdstate() != 0) { //Check if the file doesn't have a good status when opened (ios::rdstate() returns 0 when the file opens fine)
+        cerr << "Unable to open file: " << argv[1] << endl;
         return 1;
     }
-    circuitFile.close(); //Close the file. Remove and pass the file object, pass the path, or pass the file contents to syntax
+    circuitFile.close(); //Close the file, and the file object is destroyed upon closing
 
-    cout << "Opening file " << filePath << "..." << endl;
+    cout << "Opening file " << argv[1] << "..." << endl;
     
-    //Call to syntax to analyze the file
-    
+    //Call to syntax passing the path to parse
+    vector<connection> connectionsStorage; //JANK SETUP FOR NOW: modify logic class to support references and pointers so that the objects can persist after function destruction
+    vector<element> parsedElements = syntaxRead(argv[1], connectionsStorage); //Send file path (that is known to exist) to parse into elements
+
+    cout << "Here are the elements rolling in..." << endl;
+    for(size_t index = 0; index < parsedElements.size(); index++) { //Loop through elements from syntax
+        cout << parsedElements[index].getName() << " [" << parsedElements[index].getType() << "]" << endl;
+        vector<connection> connsToIterate = parsedElements[index].getConnections(); //All the connections of the current element
+        for(size_t index2 = 0; index2 < connsToIterate.size(); index2++) {  //Loop through connections
+            
+        }
+    }
+
+    //Have some way to change input. Maybe make a truth table and allow for editing of values? Adhere to Specification 2.1.8 with evaluating only on input changes.
+
     return 0;
 }

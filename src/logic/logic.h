@@ -17,6 +17,9 @@ class element {
         string setName(string name);
         void addConnection(element *dest);
         string setValue(string newValue);
+        string getType();
+        string getName();
+        vector<connection> getConnections();
         string evaluate();
 };
 

@@ -26,6 +26,10 @@ string element::setName(string name) {
     return unpreferred;
 }
 
+string element::getType() { return this->type; }
+string element::getName() { return this->name; }
+vector<connection> element::getConnections() { return this->connections; }
+
 string element::setValue(string newValue) {
     this->value = newValue;
     return this->value;
