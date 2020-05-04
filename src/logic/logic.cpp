@@ -52,6 +52,14 @@ element::element(string type, string name) {
     this->setName(name);
 }
 
+// adds a connection to an element
+void element::addConnection(element *dest) {
+    connection newConnection;
+    newConnection.setSource(this);
+    newConnection.setDestination(dest);
+    this->connections.push_back(newConnection);
+}
+
 // sets the source element of a connection
 void connection::setSource(element *source) { this->source = source; }
 
