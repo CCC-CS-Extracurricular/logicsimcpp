@@ -53,9 +53,9 @@ element::element(string type, string name) {
 }
 
 // adds a connection to an element
-void element::addConnection(element *dest) {
+void element::addConnection(element *src, element *dest) {
     connection newConnection;
-    newConnection.setSource(this);
+    newConnection.setSource(src);
     newConnection.setDestination(dest);
     this->connections.push_back(newConnection);
 }
@@ -64,7 +64,7 @@ void element::addConnection(element *dest) {
 void connection::setSource(element *source) { this->source = source; }
 
 // sets the destination element of a connection
-void connection::setDestination(element *source) { this->destination = destination; }
+void connection::setDestination(element *destination) { this->destination = destination; }
 
 // returns the source element of a connection
 element* connection::getSource() { return this->source; }

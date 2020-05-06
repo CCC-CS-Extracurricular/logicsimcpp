@@ -8,4 +8,4 @@
 #include <string>
 #include <vector>
 
-vector<element> syntaxRead(string filePath, vector<connection> connectionStorage);
+vector<element> syntaxRead(string filePath);

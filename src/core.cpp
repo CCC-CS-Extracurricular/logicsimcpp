@@ -19,16 +19,17 @@ int main(int argc, char** argv) {
     cout << "Opening file " << argv[1] << "..." << endl;
     
     //Call to syntax passing the path to parse
-    vector<connection> connectionsStorage; //JANK SETUP FOR NOW: modify logic class to support references and pointers so that the objects can persist after function destruction
-    vector<element> parsedElements = syntaxRead(argv[1], connectionsStorage); //Send file path (that is known to exist) to parse into elements
+    vector<element> parsedElements = syntaxRead(argv[1]); //Send file path (that is known to exist) to parse into elements
 
     cout << "Here are the elements rolling in..." << endl;
     for(size_t index = 0; index < parsedElements.size(); index++) { //Loop through elements from syntax
-        cout << parsedElements[index].getName() << " [" << parsedElements[index].getType() << "]" << endl;
+        cout << parsedElements[index].getName() << " [" << parsedElements[index].getType() << "] ";
         vector<connection> connsToIterate = parsedElements[index].getConnections(); //All the connections of the current element
-        for(size_t index2 = 0; index2 < connsToIterate.size(); index2++) {  //Loop through connections
-            //   
+        cout << "#" << connsToIterate.size() << " ";
+        for(size_t connIndex = 0; connIndex < connsToIterate.size(); connIndex++) {  //Loop through connections
+            cout << connsToIterate[connIndex].getSource()->getName() << " -> " << connsToIterate[connIndex].getDestination()->getName() << " ";
         }
+        cout << endl;
     }
 
     //Have some way to change input. Maybe make a truth table and allow for editing of values? Adhere to Specification 2.1.8 with evaluating only on input changes.

@@ -15,7 +15,7 @@ class element {
         element(string type, string name);
         string setType(string type);
         string setName(string name);
-        void addConnection(element *dest);
+        void addConnection(element *src, element *dest);
         string setValue(string newValue);
         string getType();
         string getName();

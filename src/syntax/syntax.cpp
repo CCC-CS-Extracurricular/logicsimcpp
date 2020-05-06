@@ -1,10 +1,10 @@
 #include "syntax.h"
 
-#define __DEBUG 1	//Uncomment to see debug output on the command line
+//#define __DEBUG 1	//Uncomment to see debug output on the command line
 
 using namespace std;
 
-vector<element> syntaxRead(string filePath, vector<connection> connectionStorage) {
+vector<element> syntaxRead(string filePath) {
 	#ifdef __DEBUG
 	cout << "##########\n# PARSER #\n##########" << endl;
 	#endif
@@ -20,7 +20,6 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 		 */
 	ifstream circuitFile(filePath);	//File object for the file to parse which is initialized to the path passed to the function
 	vector<element> elements;	//Elements created in the process of parsing the file
-	queue<string> lineTokens;	//Tokens found by lexical analysis
 	//queue<string> tokens;	//Tokens that are not predefined and are created by the userg
 	string line;	//Line to process
 	string match;
@@ -32,11 +31,11 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 	types.push_back("not");
 	types.push_back("switch");
 	types.push_back("lamp");
-	types.pop_back();
 
 	//Syntax analysis
 	while(!circuitFile.eof()) {	//Run if the file pointer isn't at the end of the file
 		getline(circuitFile, line);
+		queue<string> lineTokens;	//Tokens found by lexical analysis
 
 		#ifdef __DEBUG
 		cout << "\n\nCurrent line being parsed:\n\t" << line << endl;
@@ -93,7 +92,7 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 				break;
 			}
 		}
-
+		
 		/* According to the specification, all lines would have tokens in multiples of two (Specification 2.1.13).
 		 * A declaration would have elementType, elementName (2 tokens).
 		 * A definition would have elementName, signalName, elementName, signalName (4 tokens).
@@ -120,8 +119,7 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 					break;
 				}
 			}
-		} 
-		/*else if(lineTokens.size() == 4) {	//Check for definition
+		} else if(lineTokens.size() == 4) {	//Check for definition
 			//Implement check for definitions to apply to 2.1.9 and 2.1.10. Switches cannot be destinations, and lamps cannot be source
 			#ifdef __DEBUG
 			cout << "\tChecking declaration..." << endl;
@@ -129,19 +127,19 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 			for(size_t _i = 0; _i < 2; _i++) { //Loop twice
 				string sourceElementStr = lineTokens.front();	//Obtain the first token
 				string destElementStr;
-				element sourceElement("", "");
+				element* sourceElement;
 				element* destElement;
 				for(size_t index = 0; index < elements.size(); index++) {	//Loop through elements
 					if(sourceElementStr == elements[index].getName()) {
 						reqFlags = reqFlags ^ 0b00001000;	//Set the proper bit to true
-						sourceElement = elements[index];	//Set the elements to be the same
+						sourceElement = &elements[index];	//Set the elements to be the same
 						break;
 					}
 				}
 				if(reqFlags & 0b00001000) { //Check if bit was set
 					lineTokens.pop();	//Shift elements forward
-					string destElementStr = lineTokens.front();	//Get next element
-					reqFlags = reqFlags ^ 0b11110111;	//Reset bit
+					destElementStr = lineTokens.front();	//Get next element
+					reqFlags = reqFlags ^ 0b00001000;	//Reset bit
 				} else {
 					break;
 				}
@@ -153,12 +151,21 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 					}
 				}
 				if(reqFlags & 0b00001000) { //Check if bit was set
-					sourceElement.addConnection(destElement);	//Apply the connection to the element
+					#ifdef __DEBUG
+					cout << "adding connection " << destElement->getName() << endl;
+					#endif
+					sourceElement->addConnection(sourceElement, destElement);	//Apply the connection to the source
+					destElement->addConnection(sourceElement, destElement);	//Apply the connection to the destination
+					lineTokens.pop();	//Pop off the destination token
 				} else {
+					#ifdef __DEBUG
+					cout << "not adding connection" << endl;
+					#endif
 					break;
 				}
+				reqFlags = reqFlags ^ 0b00001000;
 			}
-		}*/
+		}
 
 		//Flag check
 		if(!(reqFlags & 0b00001110)) {	//Check if the flags are not set as expected
