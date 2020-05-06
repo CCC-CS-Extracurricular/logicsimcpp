@@ -1,10 +1,10 @@
 #include "../logic/logic.h"
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <queue>
-#include <regex>
 #include <string>
 #include <vector>
 

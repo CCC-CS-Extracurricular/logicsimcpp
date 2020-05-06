@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
         cout << parsedElements[index].getName() << " [" << parsedElements[index].getType() << "]" << endl;
         vector<connection> connsToIterate = parsedElements[index].getConnections(); //All the connections of the current element
         for(size_t index2 = 0; index2 < connsToIterate.size(); index2++) {  //Loop through connections
-            
+            //   
         }
     }
 

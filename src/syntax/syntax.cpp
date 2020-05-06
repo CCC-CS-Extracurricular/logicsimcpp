@@ -10,7 +10,6 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 	#endif
 
 	//Variables
-	//char* match = (char*)malloc(sizeof(char) * 100);	//Match data from scanf
 	char reqFlags = 0b00000110;	//Create a char to store bits to check that file meets requirements
 		/*
 		 * Bit 0: All inputs are connected to an output (Specification 2.1.7)
@@ -20,12 +19,12 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 		 * Bit 4-7: Ignored
 		 */
 	ifstream circuitFile(filePath);	//File object for the file to parse which is initialized to the path passed to the function
+	vector<element> elements;	//Elements created in the process of parsing the file
 	queue<string> lineTokens;	//Tokens found by lexical analysis
-	//queue<string> tokens;	//Tokens that are not predefined and are created by the user
+	//queue<string> tokens;	//Tokens that are not predefined and are created by the userg
 	string line;	//Line to process
 	string match;
 	vector<string> types;	//Tokens that the system has base support for
-	vector<element> elements;	//Elements created in the process of parsing the file
 
 	//Add values to defaultTokens vector
 	types.push_back("and");
@@ -33,6 +32,7 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 	types.push_back("not");
 	types.push_back("switch");
 	types.push_back("lamp");
+	types.pop_back();
 
 	//Syntax analysis
 	while(!circuitFile.eof()) {	//Run if the file pointer isn't at the end of the file
@@ -105,7 +105,7 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 			 *	(Too lazy to do it now...) What happens if the element exists already? Throw an error, obviously. It's more important that it works to begin with, so bugtesting can come later...
 			 */
 			#ifdef __DEBUG
-			cout << "\tChecking declaration..." << endl;
+			cout << "\tChecking for declaration/definition..." << endl;
 			#endif
 			string elementType = lineTokens.front();	//Grab and remove first element
 			for(size_t index = 0; index < types.size(); index++) {
@@ -120,7 +120,8 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 					break;
 				}
 			}
-		} else if(lineTokens.size() == 4) {	//Check for definition
+		} 
+		/*else if(lineTokens.size() == 4) {	//Check for definition
 			//Implement check for definitions to apply to 2.1.9 and 2.1.10. Switches cannot be destinations, and lamps cannot be source
 			#ifdef __DEBUG
 			cout << "\tChecking declaration..." << endl;
@@ -157,7 +158,7 @@ vector<element> syntaxRead(string filePath, vector<connection> connectionStorage
 					break;
 				}
 			}
-		}
+		}*/
 
 		//Flag check
 		if(!(reqFlags & 0b00001110)) {	//Check if the flags are not set as expected
