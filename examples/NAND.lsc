@@ -1,0 +1,12 @@
+//NAND implementation
+and and0
+not not0
+
+switch S0
+switch S1
+lamp L0
+
+L0 not0
+not0 and0
+and0 S0 and0 S1
+

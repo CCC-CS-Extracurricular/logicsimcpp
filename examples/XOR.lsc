@@ -1,0 +1,15 @@
+//XOR implementation
+and nand_and
+not nand_not
+or or0
+and and0
+
+switch S0
+switch S1
+lamp L0
+
+L0 and0
+and0 or0 and0 nand_not
+nand_not nand_and
+nand_and S0 nand_and S1
+or0 S0 or0 S1

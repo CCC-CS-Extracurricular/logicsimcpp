@@ -16,11 +16,11 @@ vector<element> syntaxRead(string filePath) {
 		 * Bit 1: Pass lexical analysis (set to false if failure occurs) (Specification 2.1.13)
 		 * Bit 2: Pass grammatical analysis (set to false if failure occurs) (Specification 2.1.13)
 		 * Bit 3: Grammatical analysis check if element exists or not
-		 * Bit 4-7: Ignored
+		 * Bit 4: Token exists as a builtin type
+		 * Bit 5-7: Ignored
 		 */
 	ifstream circuitFile(filePath);	//File object for the file to parse which is initialized to the path passed to the function
 	vector<element> elements;	//Elements created in the process of parsing the file
-	//queue<string> tokens;	//Tokens that are not predefined and are created by the userg
 	string line;	//Line to process
 	string match;
 	vector<string> types;	//Tokens that the system has base support for
@@ -31,6 +31,8 @@ vector<element> syntaxRead(string filePath) {
 	types.push_back("not");
 	types.push_back("switch");
 	types.push_back("lamp");
+
+//gcc has four phases: preprocessing, compiling, assembly, and linking. You can specifify to 
 
 	//Syntax analysis
 	while(!circuitFile.eof()) {	//Run if the file pointer isn't at the end of the file
@@ -57,13 +59,19 @@ vector<element> syntaxRead(string filePath) {
 		//Lexical analysis
 		for(size_t index = 0; index < line.length(); index++) {	//Loop through line
 			#ifdef __DEBUG
-			cout << "\tMatching character (" << index << "/" << line.length() <<"): " << line[index];
+			cout << "\tMatching character (" << index << "/" << line.length() - 1 <<"): " << line[index];
 			printf(":%x\n", line[index]);
 			#endif
+			/*
 			if((line[index] > 0x40 && line[index] < 0x5b) ||	//Check if character is in between A and Z (ascii values)
 			   (line[index] > 0x60 && line[index] < 0x7b) ||	//Check if character is in between a and z (ascii values)
 			   (line[index] > 0x2f && line[index] < 0x3a) ||	//Check if character is in between 0 and 9 (ascii values) (out of specification, but used as an example)
 			   (line[index] == 0x2d) || (line[index] == 0x5f)) {	//Check if character is a dash or underscore
+			*/
+			if((line[index] >= 'A' && line[index] <= 'Z') ||	//Check if character is in between A and Z (ascii values)
+			   (line[index] >= 'a' && line[index] <= 'z') ||	//Check if character is in between a and z (ascii values)
+			   (line[index] >= '0' && line[index] <= '9') ||	//Check if character is in between 0 and 9 (ascii values) (out of specification, but used as an example)
+			   (line[index] == '-') || (line[index] == '_')) {	//Check if character is a dash or underscore
 				#ifdef __DEBUG
 				cout << "\t\tCharacter match!" << endl;
 				#endif
@@ -92,79 +100,121 @@ vector<element> syntaxRead(string filePath) {
 				break;
 			}
 		}
+		if(!(reqFlags & 0b00000010)) {
+			cerr << "ERR: Failed lexical analysis." << endl;
+			break;
+		}
+
+		#ifdef __DEBUG
+		cout << endl;
+		#endif
 		
 		/* According to the specification, all lines would have tokens in multiples of two (Specification 2.1.13).
 		 * A declaration would have elementType, elementName (2 tokens).
 		 * A definition would have elementName, signalName, elementName, signalName (4 tokens).
 		 * Therefore, we can perform a size check on the queue to make sure that the queue is 2 or 4, and execute accordingly.
 		 */
+		/* BUG TO FIX:
+		 *	(Too lazy to do it now...) What happens if the element exists already? Throw an error, obviously. It's more important that it works to begin with, so bugtesting can come later...
+		 */
 		//Grammatical analysis
-		if(lineTokens.size() == 2) {	//Check for declaration
-			/* BUG TO FIX:
-			 *	(Too lazy to do it now...) What happens if the element exists already? Throw an error, obviously. It's more important that it works to begin with, so bugtesting can come later...
-			 */
+		if(lineTokens.size() % 2 == 0) {	//If there are 2*n elements and passed lexical analysis
 			#ifdef __DEBUG
-			cout << "\tChecking for declaration/definition..." << endl;
+			cout << "Beginning grammatical analysis..." << endl;
 			#endif
-			string elementType = lineTokens.front();	//Grab and remove first element
+			string initToken = lineTokens.front();
+			
+			//Initial token sweep
 			for(size_t index = 0; index < types.size(); index++) {
-				if(elementType == types[index]) {	//If the elementName is one of the builtin types, process the data
-					lineTokens.pop();	//Force name of element to front
-					element newedElement(elementType, lineTokens.front());	//Create a new element with the type and name (now front of tokens list) passed to the constructor
-					elements.push_back(newedElement);	//Add new element to list
-					lineTokens.pop();	//Empty token list for next line
-					#ifdef __DEBUG
-					cout << "\tSize after emptying: " << lineTokens.size() << endl;
-					#endif
+				#ifdef __DEBUG
+				cout << "\tChecking " << initToken << " against " << types[index] << " for a builtin type..." << endl;
+				#endif
+				if(initToken == types[index]) {	//Check if the token is a builtin type
+					reqFlags = reqFlags ^ 0b00010000;	//Set token exists flag
 					break;
 				}
 			}
-		} else if(lineTokens.size() == 4) {	//Check for definition
-			//Implement check for definitions to apply to 2.1.9 and 2.1.10. Switches cannot be destinations, and lamps cannot be source
-			#ifdef __DEBUG
-			cout << "\tChecking declaration..." << endl;
-			#endif
-			for(size_t _i = 0; _i < 2; _i++) { //Loop twice
-				string sourceElementStr = lineTokens.front();	//Obtain the first token
-				string destElementStr;
-				element* sourceElement;
-				element* destElement;
-				for(size_t index = 0; index < elements.size(); index++) {	//Loop through elements
-					if(sourceElementStr == elements[index].getName()) {
-						reqFlags = reqFlags ^ 0b00001000;	//Set the proper bit to true
-						sourceElement = &elements[index];	//Set the elements to be the same
+
+			if(reqFlags & 0b00010000) {	//If the token is a builtin type
+				#ifdef __DEBUG
+				cout << "Builtin type." << endl;
+				#endif
+				lineTokens.pop();	//Force name of element to front
+				element newElement(initToken, lineTokens.front());	//Create a new element with the type and name (now front of tokens list) passed to the constructor
+				elements.push_back(newElement);	//Add new element to list
+				lineTokens.pop();	//Empty token list for next line
+				if(!lineTokens.size()) {	//If there are no more element in the tokens on that line
+					reqFlags = reqFlags ^ 0b00000100;	//Sets pass for grammatical analysis
+				} else {
+					cerr << "ERR: Declarations only take two tokens." << endl;
+					break;
+				}
+			} else {	//If the initial token wasn't found to be a builtin type
+				for(size_t index = 0; index < elements.size(); index++) {
+					#ifdef __DEBUG
+					cout << "\tChecking " << initToken << " against " << elements[index].getName() << " for an existing element..." << endl;
+					#endif
+					if(initToken == elements[index].getName()) {	//Check if the token exists as another element
+						reqFlags = reqFlags ^ 0b00010000;	//Set token exists flag
 						break;
 					}
 				}
-				if(reqFlags & 0b00001000) { //Check if bit was set
-					lineTokens.pop();	//Shift elements forward
-					destElementStr = lineTokens.front();	//Get next element
-					reqFlags = reqFlags ^ 0b00001000;	//Reset bit
-				} else {
-					break;
-				}
-				for(size_t index = 0; index < elements.size(); index++) {	//Loop through elements
-					if(destElementStr == elements[index].getName()) {
-						reqFlags = reqFlags ^ 0b00001000;	//Set the proper bit to true
-						destElement = &elements[index];	//Get address of the element pointer
-						break;
+				if(reqFlags & 0b00010000) {	//If the token is an element name
+					reqFlags = reqFlags ^ 0b00010000;	//Reset token exists flag
+					while(lineTokens.size()) {	//Loop until there are no tokens left to parse
+						//Variables
+						string source = lineTokens.front();	//Obtain the first token (repetative, but needed for initial loop)
+						string dest;
+						element* sourceElement;
+						element* destElement;
+
+						//Check if source is an element
+						for(size_t index = 0; index < elements.size(); index++) {	//Loop through elements
+							if(source == elements[index].getName()) {	//If the first element is an element
+								reqFlags = reqFlags ^ 0b00001000;	//Set the element exists flag
+								sourceElement = &elements[index];	//Set the source address to the current element's address
+								break;
+							}
+						}
+						if(reqFlags & 0b00001000) {	//Check if element existing flag is set
+							lineTokens.pop();	//Shift tokens
+							dest = lineTokens.front();	//Set destination to next token
+							reqFlags = reqFlags ^ 0b00001000;	//Reset element exist flag
+						} else {
+							cerr << "ERR: Could not find source element." << endl;
+							break;
+						}
+
+						//Check if destination is an element
+						for(size_t index = 0; index < elements.size(); index++) {	//Loop through elements
+							if(dest == elements[index].getName()) {	//Check if destination exists as an element
+								reqFlags = reqFlags ^ 0b00001000;	//Set element exist flag
+								destElement = &elements[index];	//Set the destination adress to the current element's address
+								break;
+							}
+						}
+						if(reqFlags & 0b00001000) {
+							#ifdef __DEBUG
+							cout << "Adding connection from " << sourceElement->getName() << " to " << destElement->getName() << endl;
+							#endif
+							sourceElement->addConnection(sourceElement, destElement);	//Apply the connection to the source
+							destElement->addConnection(sourceElement, destElement);	//Apply the connection to the destination
+
+							lineTokens.pop();	//Shift tokens
+							reqFlags = reqFlags ^ 0b00001000;	//Reset element exist flag
+						} else {
+							cerr << "ERR: Could not find destination element." << endl;
+							break;
+						}
 					}
-				}
-				if(reqFlags & 0b00001000) { //Check if bit was set
-					#ifdef __DEBUG
-					cout << "adding connection " << destElement->getName() << endl;
-					#endif
-					sourceElement->addConnection(sourceElement, destElement);	//Apply the connection to the source
-					destElement->addConnection(sourceElement, destElement);	//Apply the connection to the destination
-					lineTokens.pop();	//Pop off the destination token
 				} else {
-					#ifdef __DEBUG
-					cout << "not adding connection" << endl;
-					#endif
+					cerr << "ERR: Invalid start of line token." << endl;
 					break;
 				}
-				reqFlags = reqFlags ^ 0b00001000;
 			}
+		} else {
+			cerr << "ERR: Cannot parse tokens." << endl;
+			break;
 		}
 
 		//Flag check
@@ -174,6 +224,7 @@ vector<element> syntaxRead(string filePath) {
 			break;	//Quit loop over lines
 		}
 
+		reqFlags = reqFlags & 0b11101111;	//Make sure token exists flag is reset before looping again by masking out the bit
 	}
 	
 	return elements;
