@@ -8,6 +8,8 @@ using namespace std;
 string preferred = "1";         // preferred string (defaults to 1)
 string unpreferred = "0";       // unpreferred string (defaults to 0)
 
+#define __DEBUG = 1
+
 // set element type
 string element::setType(string type) {
     // set type only if the given type is valid
@@ -42,6 +44,9 @@ string element::setValue(string newValue) {
         this->value = newValue;
         return preferred;
     }
+    #ifdef __DEBUG
+    cout << "value " << newValue << " is invalid, must be one of (" << preferred << ", " << unpreferred << ")" << endl;
+    #endif
     return unpreferred;
 }
 
@@ -73,13 +78,14 @@ element* connection::getSource() { return this->source; }
 element* connection::getDestination() { return this->destination; }
 
 string element::evaluate() {
+
     // NOT evaluate function
     if(this->type == "not") {
         string input;
         /* find our single input (aka destinations)
          * by comparing `this` to all of our destination connections*/
-        for(unsigned int i; i < this->connections.size(); i++) {
-            if(this->connections[i].getDestination() == this) {
+        for(size_t i=0; i < this->connections.size(); i++) {
+            if(this->connections[i].getSource() == this) {
                 input = this->connections[i].getDestination()->evaluate();
             }
         }
@@ -100,10 +106,10 @@ string element::evaluate() {
         int x = 0;
 
         // find two destination/input connections
-        for(unsigned int i; i < this->connections.size(); i++) {
-            if(this->connections[i].getDestination() == this) {
+        for(size_t i=0; i < this->connections.size(); i++) {
+            if(this->connections[i].getSource() == this) {
                 // FIXME: this needs error checking
-                input[x] = connections[i].getDestination()->evaluate();
+                input.push_back(connections[i].getDestination()->evaluate());
                 x++;
             }
         }
@@ -120,10 +126,10 @@ string element::evaluate() {
 
         /* find our two inputs (aka destinations)
          * by comparing `this` to all of our destination connections*/
-        for(unsigned int i; i < this->connections.size(); i++) {
-            if(this->connections[i].getDestination() == this) {
+        for(size_t i=0; i < this->connections.size(); i++) {
+            if(this->connections[i].getSource() == this) {
                 // FIXME: this needs error checking
-                input[x] = connections[i].getDestination()->evaluate();
+                input.push_back(connections[i].getDestination()->evaluate());
                 x++;
             }
         }
@@ -149,7 +155,7 @@ string element::evaluate() {
     /* SWITCH evaluate function
      * switches return their stored values when they are evaluated */
     if(this->type == "switch") {
-        return value;
+        return this->value;
     }
 
     /* LAMP evaluate function
@@ -158,8 +164,8 @@ string element::evaluate() {
         string input;
         /* find our single input (aka destinations)
          * by comparing `this` to all of our destination connections*/
-        for(unsigned int i; i < this->connections.size(); i++){
-            if(this->connections[i].getDestination() == this) {
+        for(size_t i=0; i < this->connections.size(); i++){
+            if(this->connections[i].getSource() == this) {
                 input = this->connections[i].getDestination()->evaluate();
             }
         }
@@ -167,8 +173,10 @@ string element::evaluate() {
         /* Set our value to preferred or unpreferred depending by input */
         if(input == preferred) {
             this->value = preferred;
+            return preferred;
         }
         this->value = unpreferred;
+        return unpreferred;
     }
     return unpreferred;
 }
