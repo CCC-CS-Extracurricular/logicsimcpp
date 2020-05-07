@@ -57,7 +57,8 @@ int main(int argc, char** argv) {
             #ifdef __DEBUG
             cout << "Evaluating " << parsedElements[index].getName() << "..." << endl;
             #endif
-            string state = parsedElements[index].evaluate();   //Evaluate lamp's value
+            parsedElements[index].evaluate();   //Evaluate lamp's value
+            string state = parsedElements[index].getValue();
             cout << parsedElements[index].getName() << ": " << state << endl;
         }
     }
